@@ -1,4 +1,4 @@
-const BOARD = [
+let BOARD = [
     [-1, -1, -1],
     [-1, -1, -1],
     [-1, -1, -1]
@@ -11,63 +11,91 @@ const BOARD = [
 let CURRENT_PLAY = 0
 let GAME_OVER = false
 
+const resetBoard = () => {
+    BOARD = [
+        [-1, -1, -1],
+        [-1, -1, -1],
+        [-1, -1, -1]
+    ]
+
+    CURRENT_PLAY = 0
+    GAME_OVER = false
+
+    const statusDiv = document.getElementById("status")
+    statusDiv.classList.remove("you-won")
+    statusDiv.innerHTML = "Move your mouse over a square and click to play an X or an O."
+}
+
 window.addEventListener('load', () => {
     const divs = document.querySelectorAll("#board div")
-    divs.forEach((div, i) => {
-        const classList = div.classList
+    divs.forEach(handleBoardTile)
 
-        // Add styles
-        classList.add("square")
+    const resetBtn = document.querySelector(".controls button.btn")
+    resetBtn.addEventListener('click', (e) => {
+        e.preventDefault();
 
-        // Add logic
-        div.addEventListener('click', () => {
-            if (GAME_OVER)
-                return
-
-            if (classList.contains("X") || classList.contains("O"))
-                return;
-
-            if (CURRENT_PLAY % 2 == 0) {
-                div.innerHTML = "X"
-                classList.add("X")
-                BOARD[parseInt(i / 3)][i % 3] = 0
-            } else {
-                div.innerHTML = "O"
-                classList.add("O")
-                BOARD[parseInt(i / 3)][i % 3] = 1
-            }
-
-            CURRENT_PLAY++;
-
-            const statusDiv = document.getElementById("status");
-            switch (checkWin()) {
-                case 0: {
-                    statusDiv.innerHTML = "Congratulations! X is the winner!";
-                    statusDiv.classList.add("you-won");
-                    GAME_OVER = true
-                    break;
-                }
-                case 1: {
-                    statusDiv.innerHTML = "Congratulations! O is the winner!";
-                    statusDiv.classList.add("you-won");
-                    GAME_OVER = true
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
-        })
-
-        div.addEventListener('mouseover', () => {
-            classList.add("hover")
-        })
-
-        div.addEventListener('mouseout', () => {
-            classList.remove("hover")
+        resetBoard()
+        divs.forEach(div => {
+            div.innerHTML = ""
+            div.classList.remove("X", "O")
         })
     })
 })
+
+const handleBoardTile = (div, i) => {
+    const classList = div.classList
+
+    // Add styles
+    classList.add("square")
+
+    // Add logic
+    div.addEventListener('click', () => {
+        if (GAME_OVER)
+            return
+
+        if (classList.contains("X") || classList.contains("O"))
+            return;
+
+        if (CURRENT_PLAY % 2 == 0) {
+            div.innerHTML = "X"
+            classList.add("X")
+            BOARD[parseInt(i / 3)][i % 3] = 0
+        } else {
+            div.innerHTML = "O"
+            classList.add("O")
+            BOARD[parseInt(i / 3)][i % 3] = 1
+        }
+
+        CURRENT_PLAY++;
+
+        const statusDiv = document.getElementById("status");
+        switch (checkWin()) {
+            case 0: {
+                statusDiv.innerHTML = "Congratulations! X is the winner!";
+                statusDiv.classList.add("you-won");
+                GAME_OVER = true
+                break;
+            }
+            case 1: {
+                statusDiv.innerHTML = "Congratulations! O is the winner!";
+                statusDiv.classList.add("you-won");
+                GAME_OVER = true
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    })
+
+    div.addEventListener('mouseover', () => {
+        classList.add("hover")
+    })
+
+    div.addEventListener('mouseout', () => {
+        classList.remove("hover")
+    })
+}
 
 const checkWin = () => {
     // Check rows
