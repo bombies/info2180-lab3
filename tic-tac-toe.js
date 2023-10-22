@@ -9,6 +9,7 @@ const BOARD = [
  * If it is not then vice-versa.
  */
 let CURRENT_PLAY = 0
+let GAME_OVER = false
 
 window.addEventListener('load', () => {
     const divs = document.querySelectorAll("#board div")
@@ -20,6 +21,9 @@ window.addEventListener('load', () => {
 
         // Add logic
         div.addEventListener('click', () => {
+            if (GAME_OVER)
+                return
+
             if (classList.contains("X") || classList.contains("O"))
                 return;
 
@@ -33,7 +37,26 @@ window.addEventListener('load', () => {
                 BOARD[parseInt(i / 3)][i % 3] = 1
             }
 
-            CURRENT_PLAY++
+            CURRENT_PLAY++;
+
+            const statusDiv = document.getElementById("status");
+            switch (checkWin()) {
+                case 0: {
+                    statusDiv.innerHTML = "Congratulations! X is the winner!";
+                    statusDiv.classList.add("you-won");
+                    GAME_OVER = true
+                    break;
+                }
+                case 1: {
+                    statusDiv.innerHTML = "Congratulations! O is the winner!";
+                    statusDiv.classList.add("you-won");
+                    GAME_OVER = true
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
         })
 
         div.addEventListener('mouseover', () => {
@@ -45,4 +68,83 @@ window.addEventListener('load', () => {
         })
     })
 })
+
+const checkWin = () => {
+    // Check rows
+    let consecX = 0
+    let consecO = 0
+
+    const checkTile = (tile) => {
+        switch (tile) {
+            case 0: {
+                consecX++;
+                consecO = 0;
+                break;
+            }
+            case 1: {
+                consecO++;
+                consecX = 0;
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+
+    const isWin = () => {
+        if (consecX == 3)
+            return 0;
+        else if (consecO == 3)
+            return 1;
+    }
+
+    // Check Rows
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            checkTile(BOARD[i][j])
+            // Check for win to save some compute time
+            let winner = isWin()
+            if (winner != undefined)
+                return winner
+        }
+    }
+
+    consecO = 0;
+    consecX = 0;
+
+    // Check Columns
+    for (let j = 0; j < 3; j++) {
+        for (let i = 0; i < 3; i++) {
+            checkTile(BOARD[i][j])
+            let winner = isWin()
+            if (winner != undefined)
+                return winner
+        }
+    }
+
+    consecO = 0;
+    consecX = 0;
+
+    // Diagonal Checks
+    for (let i = 0; i < 3; i++) {
+        checkTile(BOARD[i][i])
+        let winner = isWin()
+        if (winner != undefined)
+            return winner
+    }
+
+    consecO = 0;
+    consecX = 0;
+
+    for (let i = 0, j = 2; i < 3; i++, j--) {
+        checkTile(BOARD[i][j])
+        let winner = isWin()
+        if (winner != undefined)
+            return winner
+    }
+
+    // If there is no win
+    return -1;
+}
 
