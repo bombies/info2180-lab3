@@ -35,6 +35,14 @@ window.addEventListener('load', () => {
 
             CURRENT_PLAY++
         })
+
+        div.addEventListener('mouseover', () => {
+            classList.add("hover")
+        })
+
+        div.addEventListener('mouseout', () => {
+            classList.remove("hover")
+        })
     })
 })
 
